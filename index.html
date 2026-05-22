@@ -81,6 +81,7 @@
     <button onclick="requestClipboard()">Request Clipboard</button>
     <button onclick="requestMidi()">Request MIDI</button>
     <button onclick="requestBluetooth()">Request Bluetooth</button>
+    <button onclick="requestFullscreen()">Request Fullscreen</button>
 
     <video id="video" autoplay playsinline muted></video>
 
@@ -165,6 +166,24 @@ Menunggu permission...
         log('📶 Bluetooth permission granted');
       } catch (err) {
         log('❌ Bluetooth permission denied: ' + err.message);
+      }
+    }
+
+    async function requestFullscreen() {
+      try {
+        const elem = document.documentElement;
+
+        if (elem.requestFullscreen) {
+          await elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen();
+        }
+
+        log('🖥️ Fullscreen activated');
+      } catch (err) {
+        log('❌ Fullscreen failed: ' + err.message);
       }
     }
 
