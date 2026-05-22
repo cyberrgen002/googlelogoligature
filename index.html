@@ -1,192 +1,254 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Permission Access Demo</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mobile Permission Lab</title>
 
-    .container {
-      background: #1e293b;
-      padding: 30px;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 700px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
+body{
+    background:#0f172a;
+    color:white;
+    padding:20px;
+}
 
-    p {
-      color: #cbd5e1;
-      text-align: center;
-    }
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 12px;
-      border: none;
-      border-radius: 10px;
-      background: #3b82f6;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+.grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:15px;
+}
 
-    button:hover {
-      background: #2563eb;
-    }
+.card{
+    background:#1e293b;
+    border-radius:20px;
+    padding:18px;
+}
 
-    .status {
-      margin-top: 20px;
-      background: #0f172a;
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 14px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
+.card h2{
+    font-size:18px;
+    margin-bottom:10px;
+}
 
-    video {
-      width: 100%;
-      margin-top: 20px;
-      border-radius: 12px;
-      background: black;
-    }
-  </style>
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#2563eb;
+    color:white;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.status{
+    margin-top:10px;
+    color:#94a3b8;
+    font-size:14px;
+}
+
+video{
+    width:100%;
+    border-radius:14px;
+    margin-top:10px;
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Permission Access Demo</h1>
-    <p>Halaman demo untuk request permission browser.</p>
 
-    <button onclick="requestCameraMic()">Request Camera & Microphone</button>
-    <button onclick="requestLocation()">Request Location</button>
-    <button onclick="requestNotifications()">Request Notification</button>
-    <button onclick="requestClipboard()">Request Clipboard</button>
-    <button onclick="requestMidi()">Request MIDI</button>
-    <button onclick="requestBluetooth()">Request Bluetooth</button>
-    <button onclick="requestFullscreen()">Request Fullscreen</button>
+<h1>📱 Mobile Permission Lab</h1>
 
-    <video id="video" autoplay playsinline muted></video>
+<div class="grid">
 
-    <div class="status" id="status">
-Menunggu permission...
-    </div>
-  </div>
+<div class="card">
+<h2>📍 Location</h2>
+<button onclick="getLocation()">Request</button>
+<div id="loc" class="status"></div>
+</div>
 
-  <script>
-    const statusBox = document.getElementById('status');
+<div class="card">
+<h2>📷 Camera</h2>
+<button onclick="getCamera()">Enable</button>
+<video id="cam" autoplay playsinline></video>
+<div id="camStatus" class="status"></div>
+</div>
 
-    function log(text) {
-      statusBox.textContent += '\n' + text;
-    }
+<div class="card">
+<h2>🎤 Microphone</h2>
+<button onclick="getMic()">Enable</button>
+<div id="micStatus" class="status"></div>
+</div>
 
-    async function requestCameraMic() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true
-        });
+<div class="card">
+<h2>🖥 Fullscreen</h2>
+<button onclick="goFullscreen()">Enter Fullscreen</button>
+</div>
 
-        document.getElementById('video').srcObject = stream;
-        log('✅ Camera & Microphone granted');
-      } catch (err) {
-        log('❌ Camera/Microphone denied: ' + err.message);
-      }
-    }
+<div class="card">
+<h2>🎬 Picture In Picture</h2>
 
-    async function requestLocation() {
-      return new Promise((resolve) => {
-        if (!navigator.geolocation) {
-          log('❌ Geolocation tidak didukung');
-          return resolve();
-        }
+<video id="pipVideo" controls loop>
+<source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+</video>
 
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            log(`✅ Location granted: ${pos.coords.latitude}, ${pos.coords.longitude}`);
-            resolve();
-          },
-          (err) => {
-            log('❌ Location denied: ' + err.message);
-            resolve();
-          }
-        );
-      });
-    }
+<button onclick="enablePIP()">Enable PiP</button>
+</div>
 
-    async function requestNotifications() {
-      try {
-        const result = await Notification.requestPermission();
-        log('🔔 Notification permission: ' + result);
-      } catch (err) {
-        log('❌ Notification error: ' + err.message);
-      }
-    }
+<div class="card">
+<h2>📥 Demo File Download</h2>
+<button onclick="downloadDemo()">Download TXT</button>
+</div>
 
-    async function requestClipboard() {
-      try {
-        await navigator.clipboard.readText();
-        log('📋 Clipboard read permission granted');
-      } catch (err) {
-        log('❌ Clipboard permission denied: ' + err.message);
-      }
-    }
+<div class="card">
+<h2>📋 Clipboard</h2>
+<button onclick="copyClipboard()">Copy Text</button>
+<div id="clipStatus" class="status"></div>
+</div>
 
-    async function requestMidi() {
-      try {
-        await navigator.requestMIDIAccess();
-        log('🎹 MIDI permission granted');
-      } catch (err) {
-        log('❌ MIDI permission denied: ' + err.message);
-      }
-    }
+<div class="card">
+<h2>📺 Screen Share</h2>
+<button onclick="shareScreen()">Share Screen</button>
+<div id="screenStatus" class="status"></div>
+</div>
 
-    async function requestBluetooth() {
-      try {
-        await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true
-        });
-        log('📶 Bluetooth permission granted');
-      } catch (err) {
-        log('❌ Bluetooth permission denied: ' + err.message);
-      }
-    }
+<div class="card">
+<h2>📳 Vibration</h2>
+<button onclick="vibratePhone()">Vibrate</button>
+</div>
 
-    async function requestFullscreen() {
-      try {
-        const elem = document.documentElement;
+<div class="card">
+<h2>🔔 Notifications</h2>
+<button onclick="notify()">Allow Notification</button>
+<div id="notifStatus" class="status"></div>
+</div>
 
-        if (elem.requestFullscreen) {
-          await elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-          elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-          elem.msRequestFullscreen();
-        }
+<div class="card">
+<h2>🔋 Battery Info</h2>
+<button onclick="batteryInfo()">Get Battery</button>
+<div id="battery" class="status"></div>
+</div>
 
-        log('🖥️ Fullscreen activated');
-      } catch (err) {
-        log('❌ Fullscreen failed: ' + err.message);
-      }
-    }
+<div class="card">
+<h2>📶 Network Info</h2>
+<button onclick="networkInfo()">Check Network</button>
+<div id="network" class="status"></div>
+</div>
 
-    </script>
+</div>
+
+<script>
+
+async function getLocation(){
+navigator.geolocation.getCurrentPosition(
+(pos)=>{
+document.getElementById('loc').innerText=
+`${pos.coords.latitude}, ${pos.coords.longitude}`;
+},
+()=>{
+document.getElementById('loc').innerText='Denied';
+});
+}
+
+async function getCamera(){
+try{
+const stream=await navigator.mediaDevices.getUserMedia({video:true});
+document.getElementById('cam').srcObject=stream;
+document.getElementById('camStatus').innerText='Camera Enabled';
+}catch{
+document.getElementById('camStatus').innerText='Denied';
+}
+}
+
+async function getMic(){
+try{
+await navigator.mediaDevices.getUserMedia({audio:true});
+document.getElementById('micStatus').innerText='Microphone Enabled';
+}catch{
+document.getElementById('micStatus').innerText='Denied';
+}
+}
+
+function goFullscreen(){
+document.documentElement.requestFullscreen();
+}
+
+async function enablePIP(){
+const video=document.getElementById('pipVideo');
+
+if(document.pictureInPictureEnabled){
+await video.requestPictureInPicture();
+}
+}
+
+function downloadDemo(){
+
+const blob=new Blob(
+['Demo safe file'],
+{type:'text/plain'}
+);
+
+const a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='demo.txt';
+a.click();
+}
+
+async function copyClipboard(){
+await navigator.clipboard.writeText('Hello from Permission Lab');
+document.getElementById('clipStatus').innerText='Copied';
+}
+
+async function shareScreen(){
+try{
+await navigator.mediaDevices.getDisplayMedia({
+video:true
+});
+document.getElementById('screenStatus').innerText='Screen Shared';
+}catch{
+document.getElementById('screenStatus').innerText='Denied';
+}
+}
+
+function vibratePhone(){
+navigator.vibrate([300,100,300]);
+}
+
+async function notify(){
+const p=await Notification.requestPermission();
+document.getElementById('notifStatus').innerText=p;
+}
+
+async function batteryInfo(){
+if(navigator.getBattery){
+const b=await navigator.getBattery();
+
+document.getElementById('battery').innerText=
+`Battery: ${Math.round(b.level*100)}%`;
+}
+}
+
+function networkInfo(){
+
+const c=navigator.connection;
+
+if(c){
+document.getElementById('network').innerText=
+`${c.effectiveType} | ${c.downlink}Mb/s`;
+}
+}
+
+</script>
+
 </body>
 </html>
